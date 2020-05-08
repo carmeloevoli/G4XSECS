@@ -1,0 +1,40 @@
+# $Id$
+#
+# Macro file for "Hadr03.cc"
+#
+# list process
+#
+/control/verbose 2
+/run/verbose 2
+#
+# Select Carbon target
+/testhadr/det/setMat G4_C
+# Select Isotope
+/testhadr/det/setIsotopeMat C12 6 12 1. g/cm3
+# Almost Infinite target
+/testhadr/det/setSize 10000 m 
+#
+# Set Process model. Options: bic, incl, qmd, ftfp, bert, qgsp
+/physics/setIonInelasticProcess incl
+#
+# Local laptop cores
+/run/numberOfThreads 4
+#
+/run/initialize
+#
+# Select fixed energy projectiles
+/gun/particle proton
+/mygun/energy 1e3 MeV
+/mygun/rand false
+#
+# WHAT?
+/process/list
+# /process/inactivate hadElastic
+# /process/inactivate ionElastic
+#
+# Output filename
+/treeManager/setFileName xsec
+#
+# Number of particles
+/run/printProgress 100000
+/run/beamOn 1000000
