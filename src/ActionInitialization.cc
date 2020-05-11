@@ -60,6 +60,9 @@ void ActionInitialization::Build() const {
     RunAction* runAction = new RunAction(fDetector, primary);
     SetUserAction(runAction);
 
+    EventAction* eventAction = new EventAction();  // XS4GCR
+    SetUserAction(eventAction);
+
     SteppingAction* steppingAction = new SteppingAction();
     SetUserAction(steppingAction);
 }
