@@ -1,7 +1,7 @@
 .DS_Store
 .cproject
 .project
-.settings/
-Hadr03-carlo/
-Hadr03-original/
-build/	
+.settings
+Hadr03-carlo
+Hadr03-original
+build
