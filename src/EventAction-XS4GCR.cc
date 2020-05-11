@@ -20,10 +20,11 @@ EventAction::~EventAction() {}
 
 void EventAction::BeginOfEventAction(const G4Event* evt) {
     G4int evtNb = evt->GetEventID();
-    // if(evtNb%100 == 0 && evtNb!=0 )
-    // {
-    //   G4cout << "---> Begin of Event: " << evtNb << G4endl;
-    // }
+
+    if (evtNb % 100 == 0 && evtNb != 0) {
+        G4cout << "---> Begin of Event: " << evtNb << G4endl;
+    }
+
 #ifndef __WITHOUT_ROOT__
     TreeManager::Instance()->EventNumber = evtNb;
 
@@ -40,7 +41,6 @@ void EventAction::BeginOfEventAction(const G4Event* evt) {
     // G4VProcess* process = processTable->FindProcess("total", particleName);
     // TreeManager::Instance()->xsec =
     // store->GetCrossSectionPerAtom(particleName,E,process,element,material);
-
 #endif
 }
 
