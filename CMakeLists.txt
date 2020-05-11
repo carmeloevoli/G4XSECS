@@ -29,10 +29,36 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
 #----------------------------------------------------------------------------
+# Setup ROOT include directories and compile definitions
+#
+find_package(ROOT)
+if(NOT ROOT_FOUND OR WITHOUT_ROOT)
+  message(WARNING "ROOT not found or disabled by hand")
+  add_definitions(-D__WITHOUT_ROOT__)
+  list(REMOVE_ITEM sources ${PROJECT_SOURCE_DIR}/src/TreeManager-XS4GCR.cc)
+  list(REMOVE_ITEM sources ${PROJECT_SOURCE_DIR}/src/TreeManagerMessenger-XS4GCR.cc)
+  list(REMOVE_ITEM headers ${PROJECT_SOURCE_DIR}/include/TreeManager-XS4GCR.hh)
+  list(REMOVE_ITEM headers ${PROJECT_SOURCE_DIR}/include/TreeManagerMessenger-XS4GCR.hh)
+else()
+  include_directories(${ROOT_INCLUDE_DIR})
+  include_directories(/usr/local/include/root)
+endif()
+
+message(STATUS "Project source dir ... ${PROJECT_SOURCE_DIR}")
+message(STATUS "Root found ........... ${ROOT_FOUND}")
+message(STATUS "GEANT4 libs .......... ${Geant4_LIBRARIES}")
+message(STATUS "ROOT libs ............ ${ROOT_LIBRARIES}")
+message(WARNING "ROOT include ......... ${ROOT_INCLUDE_DIR}")
+
+#----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(Hadr03 Hadr03.cc ${sources} ${headers})
-target_link_libraries(Hadr03 ${Geant4_LIBRARIES} )
+if(ROOT_FOUND)
+  target_link_libraries(Hadr03 ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+else()
+  target_link_libraries(Hadr03 ${Geant4_LIBRARIES})
+endif()
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
@@ -40,7 +66,7 @@ target_link_libraries(Hadr03 ${Geant4_LIBRARIES} )
 # relies on these scripts being in the current working directory.
 #
 set(Hadr03_SCRIPTS
-    debug.mac export.sh
+    debug.mac inelastic.mac p-C12.mac envHadronic.sh export.sh
   )
 
 foreach(_script ${Hadr03_SCRIPTS})

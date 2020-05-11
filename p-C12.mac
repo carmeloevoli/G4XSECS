@@ -24,8 +24,8 @@
 #
 # Select fixed energy projectiles
 /gun/particle proton
-/mygun/energy 1e3 MeV
 /mygun/rand false
+/mygun/energy 1e3 MeV
 #
 # WHAT?
 /process/list

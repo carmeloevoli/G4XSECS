@@ -31,20 +31,29 @@
 #ifndef PhysicsList_h
 #define PhysicsList_h 1
 
+#include <vector>
+
 #include "G4VModularPhysicsList.hh"
+#include "PhysicsListMessenger-XS4GCR.hh"  // XS4GCR
 #include "globals.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PhysicsList: public G4VModularPhysicsList
-{
-public:
-  PhysicsList();
- ~PhysicsList();
+class PhysicsList : public G4VModularPhysicsList {
+   public:
+    PhysicsList();
+    ~PhysicsList();
 
-public:
-  virtual void ConstructParticle();
-  virtual void SetCuts();
+   public:
+    virtual void ConstructParticle();
+    virtual void SetCuts();
+
+    virtual void ConstructProcess();                    // XS4GCR
+    virtual void AddPhysicsList(const G4String& name);  // XS4GCR
+
+   private:
+    PhysicsListMessenger* messenger;                 // XS4GCR
+    std::vector<G4VPhysicsConstructor*> hadronPhys;  // XS4GCR
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

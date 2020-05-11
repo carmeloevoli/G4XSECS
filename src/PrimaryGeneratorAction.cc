@@ -26,59 +26,83 @@
 /// \file PrimaryGeneratorAction.cc
 /// \brief Implementation of the PrimaryGeneratorAction class
 //
-// 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "PrimaryGeneratorAction.hh"
 
 #include "DetectorConstruction.hh"
-
 #include "G4Event.hh"
-#include "G4ParticleTable.hh"
 #include "G4ParticleDefinition.hh"
+#include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#ifndef __WITHOUT_ROOT__
+#include "TreeManager-XS4GCR.hh"
+#endif
+#include "PrimaryGeneratorMessenger-XS4GCR.hh"
+
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
-:G4VUserPrimaryGeneratorAction(),
- fParticleGun(0), fDetector(det)                                               
-{
-  fParticleGun  = new G4ParticleGun(1);
-  G4ParticleDefinition* particle
-           = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
-  fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleEnergy(1*MeV);    
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
+    : G4VUserPrimaryGeneratorAction(), fParticleGun(0), fDetector(det) {
+    fParticleGun = new G4ParticleGun(1);
+    G4ParticleDefinition* particle =
+        G4ParticleTable::GetParticleTable()->FindParticle("proton");  // XS4GCR
+    fParticleGun->SetParticleDefinition(particle);
+    fParticleGun->SetParticleEnergy(1 * MeV);
+    fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., 0., 0.));
+    messenger = new PrimaryGeneratorMessenger(this);  // XS4GCR
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fParticleGun;
+PrimaryGeneratorAction::~PrimaryGeneratorAction() {
+    delete fParticleGun;
+    delete messenger;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
-{
-  //this function is called at the begining of event
-  //
-  G4double halfSize = 0.5*(fDetector->GetSize());
-  G4double x0 = - halfSize;
-  
-  //randomize (y0,z0)
-  //
-  G4double beam = 0.8*halfSize; 
-  G4double y0 = (2*G4UniformRand()-1.)*beam;
-  G4double z0 = (2*G4UniformRand()-1.)*beam;
-  
-  fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-  fParticleGun->GeneratePrimaryVertex(anEvent);
+void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
+    // this function is called at the begining of event
+    //
+    G4double halfSize = 0.5 * (fDetector->GetSize());
+    G4double z0 = -halfSize;
+
+    // randomize (y0,z0)
+    //
+    G4double beam = 0.8 * halfSize;
+    G4double y0 = (2 * G4UniformRand() - 1.) * beam;
+    // G4double z0 = (2 * G4UniformRand() - 1.) * beam;
+    G4double x0 = (2 * G4UniformRand() - 1.) * beam;  // XS4GCR
+
+    G4double E = fE;
+    if (fGenerateUniformEnergyDistribution) {  // XS4GCR TODO understand this
+        G4double minE = 10.0 * MeV;
+        G4double logE =
+            log10(minE) + G4UniformRand() * (log10(fE) - log10(minE));
+        E = pow(10., logE);
+    } else if (fGenerateExponentialEnergyDistribution) {
+        G4double minE = 10.0 * MeV;
+        G4double logE =
+            log10(minE) + G4UniformRand() * (log10(fE) - log10(minE));
+        E = pow(10., logE);
+    }
+
+    fParticleGun->SetParticleEnergy(E);  // XS4GCR
+    fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
+
+#ifndef __WITHOUT_ROOT__
+    TreeManager::Instance()->PrimaryE =
+        fParticleGun->GetParticleEnergy() / MeV;  // XS4GCR
+    TreeManager::Instance()->PrimaryName =
+        fParticleGun->GetParticleDefinition()->GetParticleName();
+#endif
+
+    fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

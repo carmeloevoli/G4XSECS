@@ -28,8 +28,8 @@
 //
 //
 //
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "G4Types.hh"
 
@@ -39,72 +39,82 @@
 #include "G4RunManager.hh"
 #endif
 
-#include "G4UImanager.hh"
-#include "Randomize.hh"
-
-#include "DetectorConstruction.hh"
-#include "PhysicsList.hh"
 #include "ActionInitialization.hh"
+#include "DetectorConstruction.hh"
+#include "G4UIExecutive.hh"
+#include "G4UImanager.hh"
+#include "G4VisExecutive.hh"
+#include "PhysicsList.hh"
+#include "Randomize.hh"
 #include "SteppingVerbose.hh"
 
-#include "G4UIExecutive.hh"
-#include "G4VisExecutive.hh"
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-int main(int argc,char** argv) {
-
-  //detect interactive mode (if no arguments) and define UI session
-  G4UIExecutive* ui = nullptr;
-  if (argc == 1) ui = new G4UIExecutive(argc,argv);
-
-  //choose the Random engine
-  G4Random::setTheEngine(new CLHEP::RanecuEngine);
-
-  // Construct the default run manager
-#ifdef G4MULTITHREADED
-  G4MTRunManager* runManager = new G4MTRunManager;
-  G4int nThreads = G4Threading::G4GetNumberOfCores();
-  if (argc==3) nThreads = G4UIcommand::ConvertToInt(argv[2]);
-  runManager->SetNumberOfThreads(nThreads);
-#else
-  //my Verbose output class
-  G4VSteppingVerbose::SetInstance(new SteppingVerbose);
-  G4RunManager* runManager = new G4RunManager;
+#ifndef __WITHOUT_ROOT__
+#include "TreeManager-XS4GCR.hh"
 #endif
 
-  //set mandatory initialization classes
-  DetectorConstruction* det = new DetectorConstruction;
-  runManager->SetUserInitialization(det);
+// ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  PhysicsList* phys = new PhysicsList;
-  runManager->SetUserInitialization(phys);
+int main(int argc, char** argv) {
+    // detect interactive mode (if no arguments) and define UI session
+    G4UIExecutive* ui = nullptr;
+    if (argc == 1) ui = new G4UIExecutive(argc, argv);
 
-  runManager->SetUserInitialization(new ActionInitialization(det));
+    // choose the Random engine
+    G4Random::setTheEngine(new CLHEP::RanecuEngine);
 
-  //initialize visualization
-  G4VisManager* visManager = nullptr;
+    // Construct the default run manager
+#ifdef G4MULTITHREADED
+    G4MTRunManager* runManager = new G4MTRunManager;
+    G4int nThreads = G4Threading::G4GetNumberOfCores();
+    if (argc == 3) nThreads = G4UIcommand::ConvertToInt(argv[2]);
+    runManager->SetNumberOfThreads(nThreads);
+#else
+    // my Verbose output class
+    G4VSteppingVerbose::SetInstance(new SteppingVerbose);
+    G4RunManager* runManager = new G4RunManager;
+#endif
 
-  //get the pointer to the User Interface manager
-  G4UImanager* UImanager = G4UImanager::GetUIpointer();
+#ifndef __WITHOUT_ROOT__
+    //  TreeManager *treeManager=new TreeManager();
+    TreeManager* treeManager = TreeManager::Instance();  // XS4GCR
+#endif
 
-  if (ui)  {
-   //interactive mode
-   visManager = new G4VisExecutive;
-   visManager->Initialize();
-   ui->SessionStart();
-   delete ui;
-  }
-  else  {
-   //batch mode
-   G4String command = "/control/execute ";
-   G4String fileName = argv[1];
-   UImanager->ApplyCommand(command+fileName);
-  }
+    // set mandatory initialization classes
+    DetectorConstruction* det = new DetectorConstruction;
+    runManager->SetUserInitialization(det);
 
-  //job termination
-  delete visManager;
-  delete runManager;
+    PhysicsList* phys = new PhysicsList;
+    runManager->SetUserInitialization(phys);
+
+    runManager->SetUserInitialization(new ActionInitialization(det));
+
+    // initialize visualization
+    G4VisManager* visManager = nullptr;
+
+    // get the pointer to the User Interface manager
+    G4UImanager* UImanager = G4UImanager::GetUIpointer();
+
+    if (ui) {
+        // interactive mode
+        visManager = new G4VisExecutive;
+        visManager->Initialize();
+        ui->SessionStart();
+        delete ui;
+    } else {
+        // batch mode
+        G4String command = "/control/execute ";
+        G4String fileName = argv[1];
+        UImanager->ApplyCommand(command + fileName);
+    }
+
+#ifndef __WITHOUT_ROOT__
+    treeManager->Write();  // XS4GCR
+    delete treeManager;
+#endif
+
+    // job termination
+    delete visManager;
+    delete runManager;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -26,38 +26,55 @@
 /// \file PrimaryGeneratorAction.hh
 /// \brief Definition of the PrimaryGeneratorAction class
 //
-// 
+//
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #ifndef PrimaryGeneratorAction_h
 #define PrimaryGeneratorAction_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
+#include "G4VUserPrimaryGeneratorAction.hh"
 #include "globals.hh"
 
 class G4Event;
 class DetectorConstruction;
 
+class PrimaryGeneratorMessenger;  // XS4GCR
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
-{
-  public:
-    PrimaryGeneratorAction(DetectorConstruction*);    
-   ~PrimaryGeneratorAction();
+class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
+   public:
+    PrimaryGeneratorAction(DetectorConstruction*);
+    ~PrimaryGeneratorAction();
 
-  public:
+   public:
     virtual void GeneratePrimaries(G4Event*);
-    G4ParticleGun* GetParticleGun() {return fParticleGun;};
+    G4ParticleGun* GetParticleGun() { return fParticleGun; };
 
-  private:
-    G4ParticleGun*        fParticleGun;
+    inline void SetBeamEnergy(const G4double E) { fE = E; };  // XS4GCR
+
+    inline void SetRandom(const G4bool rd) {  // XS4GCR
+        fGenerateUniformEnergyDistribution = rd;
+        fGenerateExponentialEnergyDistribution = false;
+    };
+
+    inline void SetRandomExp(const G4bool rd) {  // XS4GCR
+        fGenerateExponentialEnergyDistribution = rd;
+        fGenerateUniformEnergyDistribution = false;
+    };
+
+   private:
+    G4ParticleGun* fParticleGun;
     DetectorConstruction* fDetector;
+
+    PrimaryGeneratorMessenger* messenger;                  // XS4GCR
+    G4double fE = 0;                                       // XS4GCR
+    G4bool fGenerateUniformEnergyDistribution = false;     // XS4GCR
+    G4bool fGenerateExponentialEnergyDistribution = true;  // XS4GCR
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
