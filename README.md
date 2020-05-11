@@ -5,7 +5,7 @@
 ```
 mkdir build
 cd build
-cmake...
+cmake ..
 source export.sh
 source envHadronic.sh
 ./Hadr03 p-C12.mac
