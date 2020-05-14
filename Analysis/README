@@ -1,0 +1,2 @@
+root [0] .L analysis.cc+
+analysis("pathtofile/xsec.root")
