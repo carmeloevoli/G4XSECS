@@ -80,18 +80,19 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     G4double x0 = (2 * G4UniformRand() - 1.) * beam;  // XS4GCR
 
     G4double E = fE;
-    //    if (fGenerateUniformEnergyDistribution) {  // XS4GCR TODO understand
+    if (fGenerateUniformEnergyDistribution) {  // XS4GCR TODO understand
     //    this
-    //        G4double minE = 10.0 * MeV;
-    //        G4double logE =
-    //            log10(minE) + G4UniformRand() * (log10(fE) - log10(minE));
-    //        E = pow(10., logE);
-    //    } else if (fGenerateExponentialEnergyDistribution) {
-    //        G4double minE = 10.0 * MeV;
-    //        G4double logE =
-    //            log10(minE) + G4UniformRand() * (log10(fE) - log10(minE));
-    //        E = pow(10., logE);
-    //    }
+      G4double minE = 10.0 * MeV;
+      G4double logE =
+	log10(minE) + G4UniformRand() * (log10(fE) - log10(minE));
+      E = pow(10., logE);
+      
+    } // else if (fGenerateExponentialEnergyDistribution) {
+    //    G4double minE = 10.0 * MeV;
+    //    G4double logE =
+    // 	 log10(minE) + G4UniformRand() * (log10(fE) - log10(minE));
+    //    E = pow(10., logE);
+    // }
 
     fParticleGun->SetParticleEnergy(E);  // XS4GCR
     fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));

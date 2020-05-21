@@ -87,7 +87,7 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
         //      fAction->SelectAction(fSelectActionCmd->GetNewIntValue(newValue));
     }
     if (command == fRandCmd) {
-        // fAction->SetRandom(fRandCmd->GetNewBoolValue(newValue));
+      //fAction->SetRandom(fRandCmd->GetNewBoolValue(newValue));
         G4cout << "PrimaryGeneratorMessenger: setting random distribution for "
                   "primaries: "
                << newValue << G4endl;
