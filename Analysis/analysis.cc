@@ -27,9 +27,9 @@ using namespace std;
 
 int np = 5;
 bool DEBUG = false;
-double lgEmin = 1.0; //MeV
-double lgEmax = 3.0; //1 GeV (in MeV)
-double step = 0.1; // energy step in logE
+double lgEmin = 2.0; //100 MeV
+double lgEmax = 5.0; //100 GeV (in MeV)
+double step = 0.05; // energy step in logE
 int Nbins = (lgEmax-lgEmin)/step;
 
 void analysis(char* filename) {
@@ -120,7 +120,7 @@ void analysis(char* filename) {
     for (int k=1; k<=Nbins; k++) cout << k << " " << hBRnorm->GetBinContent(k) << " " << hBRnorm->GetBinCenter(k) << endl;
   }
   cBR->cd(6);
-  hBRnorm->Draw("PE");
+  hBRnorm->Draw("H");
   
   cBR->Update();  
  
