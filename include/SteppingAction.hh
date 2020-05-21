@@ -47,7 +47,7 @@ class SteppingAction : public G4UserSteppingAction
     SteppingAction();
    ~SteppingAction();
 
-    virtual void UserSteppingAction(const G4Step*);
+  virtual void UserSteppingAction(const G4Step*);
     
   private:
     std::map<G4ParticleDefinition*,G4int> fParticleFlag;    

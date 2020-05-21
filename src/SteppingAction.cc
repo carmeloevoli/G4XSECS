@@ -31,11 +31,15 @@
 // ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "SteppingAction.hh"
+#include "G4BGGNucleonInelasticXS.hh"
 
 #include "G4HadronicProcess.hh"
+#include "G4ProcessTable.hh"
 #include "G4ParticleTypes.hh"
+#include "G4ProcessManager.hh"
 #include "G4RunManager.hh"
 #include "HistoManager.hh"
+#include "G4NistManager.hh"
 #include "Run.hh"
 
 #ifndef __WITHOUT_ROOT__
@@ -57,7 +61,8 @@ SteppingAction::~SteppingAction() {}
 void SteppingAction::UserSteppingAction(const G4Step* aStep) {
     Run* run = static_cast<Run*>(
         G4RunManager::GetRunManager()->GetNonConstCurrentRun());
-
+    
+    
     // count processes
     //
     const G4StepPoint* endPoint = aStep->GetPostStepPoint();
@@ -80,21 +85,48 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
     //
     const G4StepPoint* prePoint = aStep->GetPreStepPoint();
     G4double Q = -prePoint->GetKineticEnergy();
+    //std::cout << " prePoint = " << prePoint->GetKineticEnergy() << std::endl;
     G4ThreeVector Pbalance = -prePoint->GetMomentum();
 
     // initialisation of the nuclear channel identification
     //
     G4ParticleDefinition* particle = aStep->GetTrack()->GetDefinition();
     G4String partName = particle->GetParticleName();
+        
     G4String nuclearChannel = partName;
     G4HadronicProcess* hproc = dynamic_cast<G4HadronicProcess*>(process);
     const G4Isotope* target = NULL;
     if (hproc) target = hproc->GetTargetIsotope();
+    //std::cout << "target->GetName() -> " << target->GetName() << std::endl;
     G4String targetName = "XXXX";
     if (target) targetName = target->GetName();
     nuclearChannel += " + " + targetName + " --> ";
     if (targetName == "XXXX") run->SetTargetXXX(true);
 
+    //retrieve inelastic Cross Section
+    const G4DynamicParticle* dp = aStep->GetTrack()->GetDynamicParticle();
+    G4ThreeVector mom = prePoint->GetMomentumDirection();
+    //std::cout << mom.X << " " << mom.Y << " " << mom.Z << std::endl;
+    G4DynamicParticle* ndp = new G4DynamicParticle( dp->GetParticleDefinition(), mom, prePoint->GetKineticEnergy() );
+    G4Element* elm = new G4Element(target->GetName(),"",target->GetZ(), target->GetA());
+    G4NistManager* nistManager = G4NistManager::Instance();
+    G4Material* g4_c = nistManager->FindOrBuildMaterial("G4_C");
+    G4double xsection = hproc->GetElementCrossSection (ndp, elm, g4_c) ;//, const G4Material *mat=0)
+#ifndef __WITHOUT_ROOT__
+    TreeManager::Instance()->inelXsec = xsection / CLHEP::millibarn;  // XS4GCR
+#endif
+
+    
+    //G4String bulletName = ndp->GetParticleDefinition()->GetParticleName();
+    //G4double kin = ndp->GetKineticEnergy();
+    //G4BGGNucleonInelasticXS* bgg = new G4BGGNucleonInelasticXS(ndp->GetParticleDefinition());
+    //G4int targetZ = target->GetZ();
+    //G4bool isapplicable = bgg->IsElementApplicable(ndp,targetZ,g4_c); 
+    //G4double xsection = bgg->GetElementCrossSection(ndp,targetZ,g4_c);
+    //G4HadronicProcess* hp = new G4HadronicProcess();
+    //std::cout << "bulletName = " << bulletName << " kinetic energy = " << kin/CLHEP::MeV << " target->GetName() -> " << target->GetName() << " Z = " << targetZ << " isApplicable = " << isapplicable << " xsection = " << xsection/ CLHEP::millibarn << std::endl;
+    
+   
     // scattered primary particle (if any)
     //
     G4AnalysisManager* analysis = G4AnalysisManager::Instance();
@@ -108,10 +140,14 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
         Pbalance += momentum;
         //
         nuclearChannel += partName + " + ";
+	
     }
+
 
     // secondaries
     //
+   
+    
     const std::vector<const G4Track*>* secondary =
         aStep->GetSecondaryInCurrentStep();
 #ifndef __WITHOUT_ROOT__

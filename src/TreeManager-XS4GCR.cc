@@ -42,6 +42,7 @@ TreeManager::TreeManager() : fFile(0) {
     fTree->Branch("EventNumber", &EventNumber, "EventNumber/I");
     fTree->Branch("PrimaryName", &PrimaryName);
     fTree->Branch("PrimaryE", &PrimaryE, "PrimaryE/D");
+    fTree->Branch("inelXsec", &inelXsec, "inelXsec/D");
     //  fTree->Branch("xsec",&xsec,"xsec/D");
     fTree->Branch("nSec", &nSec, "nSec/I");
     fTree->Branch("ParticleName", &ParticleName);

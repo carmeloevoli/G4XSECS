@@ -28,6 +28,7 @@ class TreeManager {
     Int_t EventNumber;
     TString PrimaryName;
     Double_t PrimaryE;
+    Double_t inelXsec;
     Int_t nSec;
     TString ParticleName;
     TString ParticleType;
