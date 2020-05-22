@@ -7,10 +7,10 @@
 /control/verbose 2
 /run/verbose 2
 #
-# Select Carbon target
-/testhadr/det/setMat G4_C
+# Select Oxygen target
+/testhadr/det/setMat G4_O
 # Select Isotope
-/testhadr/det/setIsotopeMat C12 6 12 1. g/cm3
+/testhadr/det/setIsotopeMat O16 8 16 1. g/cm3
 # Almost Infinite target
 /testhadr/det/setSize 10000 m 
 #
@@ -33,7 +33,7 @@
 # /process/inactivate ionElastic
 #
 # Output filename
-/treeManager/setFileName xsec-C12
+/treeManager/setFileName xsec-O16
 #
 # Number of particles
 /run/printProgress 100000
