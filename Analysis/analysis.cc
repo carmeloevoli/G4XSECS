@@ -5,17 +5,12 @@
 #include <TTree.h>
 #include <TH1.h>
 #include <TH1D.h>
-// #include <TArrow.h>
-// #include <TGaxis.h>
+#include <TStyle.h>
 #include <TString.h>
-// #include <TGraph.h>
-// #include <TGraphAsymmErrors.h>
-// #include <TGraphErrors.h>
-// #include <TRandom.h>
-// #include <TMarker.h>
-// #include <TColor.h>
-// #include <TLatex.h>
-// #include <TLegend.h>
+#include <TMarker.h>
+#include <TColor.h>
+#include <TLatex.h>
+#include <TPaveText.h>
 
 #include <vector>
 #include <utility>
@@ -34,6 +29,8 @@ int Nbins = (lgEmax-lgEmin)/step;
 
 void analysis(char* filename) {
 
+  gStyle->SetOptStat(0);
+  gStyle->SetOptTitle(1);
   TH1D* hBR[np];
   TH1D* hXsec[np];
   TH1D* hBRnorm
@@ -124,30 +121,38 @@ void analysis(char* filename) {
     --sectors;
   }
 
-  TCanvas* cBR = new TCanvas(1);
+  Double_t w = 800;
+  Double_t h = 800;
+  //auto c = new TCanvas("c", "c", w, h);
+  TCanvas* cBR = new TCanvas("cBR","cBR",w,h);
   cBR->cd();
   cBR->Divide(2,3);
-  TCanvas* cXsec = new TCanvas(1);
+  TCanvas* cXsec = new TCanvas("cXsec","cXsec",w,h);
   cXsec->cd();
   cXsec->Divide(2,3);
   
   cout << "Simulated events:" << nev << " (" << nev2+1 << ")" <<  endl;
   for (int i=0; i<np; i++) {
-    cBR->cd(i+1); 
+    cBR->cd(i+1);
     if(DEBUG) cout << (double)xSec[i] << " / " << (double)nev << endl;
     hBR[i]->SetMarkerStyle(8);
-    hBR[i]->SetMarkerSize(.7);
+    hBR[i]->SetMarkerSize(.5);
     hBR[i]->SetMarkerColor(color[i]);
     hBR[i]->SetLineColor(color[i]);
     hBR[i]->Divide(hBRnorm);
+    //hBR[i]->GetXaxis()->SetTitleOffset(0.1);
+    //hBR[i]->GetYaxis()->SetTitleOffset(0.1);
     hBR[i]->Draw();
+
     
     cXsec->cd(i+1); 
     hXsec[i]->SetMarkerStyle(4);
-    hXsec[i]->SetMarkerSize(.7);
+    hXsec[i]->SetMarkerSize(.5);
     hXsec[i]->SetMarkerColor(color[i]);
     hXsec[i]->SetLineColor(color[i]);
     hXsec[i]->Divide(hBRnorm);
+    //hXsec[i]->GetXaxis()->SetTitleOffset(0.1);
+    //hXsec[i]->GetYaxis()->SetTitleOffset(0.1);
     hXsec[i]->Draw();
     
     if(DEBUG) for (int k=1; k<=Nbins; k++) cout << k << " " << hBR[i]->GetBinContent(k) << " " << hBR[i]->GetBinCenter(k) << endl;
