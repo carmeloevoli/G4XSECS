@@ -14,7 +14,7 @@
 # Almost Infinite target
 /testhadr/det/setSize 10000 m 
 #
-# Set Process model. Options: bic, incl, qmd, ftfp, bert, qgsp
+# Set Process model. Options: bic, incl, ftfp, qgsp
 /physics/setIonInelasticProcess incl
 #
 # Local laptop cores
