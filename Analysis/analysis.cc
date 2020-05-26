@@ -16,19 +16,20 @@
 #include <utility>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 using namespace std;
 
-int np = 5;
+int np = 6;
 bool DEBUG = false;
 double lgEmin = 2.0; //100 MeV
-double lgEmax = 6.0; //100 GeV (in MeV)
+double lgEmax = 5.0; //100 GeV (in MeV)
 double step = 0.05; // energy step in logE
 int Nbins = (lgEmax-lgEmin)/step;
 
 void analysis(char* filename) {
-
+  
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(1);
   TH1D* hBR[np];
@@ -43,26 +44,30 @@ void analysis(char* filename) {
   hXsecNominal->GetXaxis()->SetTitle("log_{10}(E/MeV)");
   hXsecNominal->GetYaxis()->SetTitle("#sigma_{inel}[mb]");
   hXsecNominal->Sumw2();
-
   
   vector<int> xSec(np, 0);
   vector<int> first(np, 0);
-  string products[] = {"C11", "B11", "Be10", "Be9", "Be7"};
-  int Znuc[] = {6,  5,  4,  4, 4};
-  int Anuc[] = {11, 11, 10, 9, 7};
-  int color[] = {kRed,  kAzure,  kSpring,  kOrange, kMagenta};
+  string products[] = {"C11", "B11", "B10", "Be10", "Be9", "Be7"};
+  int Znuc[] = {6,  5,  5, 4,  4, 4};
+  int Anuc[] = {11, 11, 10, 10, 9, 7};
+  int color[] = {kRed,  kAzure,  kSpring,  kOrange, kMagenta, kTeal};
   
   TFile* fileIn= TFile::Open(filename);
   TTree* theTree=(TTree*)fileIn->Get("tree");
 
   int run, eventNumber, nSec, A, Z;
-  double primaryE, inelXsec;
+  double primaryE, inelXsec, lifeTime;
   TString* particleName = new TString();
+  bool isStable, isShort;
+  
   
   theTree->SetBranchAddress("Run",&run);
   theTree->SetBranchAddress("EventNumber",&eventNumber);
   theTree->SetBranchAddress("PrimaryE",&primaryE);
   theTree->SetBranchAddress("inelXsec",&inelXsec);
+  theTree->SetBranchAddress("IsShortLived",&isShort);
+  theTree->SetBranchAddress("IsStable",&isStable);
+  theTree->SetBranchAddress("LifeTime",&lifeTime);
   theTree->SetBranchAddress("nSec",&nSec);
   theTree->SetBranchAddress("ParticleName",&particleName);
   theTree->SetBranchAddress("A",&A);
@@ -79,6 +84,9 @@ void analysis(char* filename) {
   for (Int_t i=0; i < nentries; i++) { 
     theTree->GetEntry(i);
 
+    //hLife->Fill(lifeTime);
+    //if(!isStable) hLifeNS->Fill(lifeTime);
+      
     if(sectors == 0) {
       sectors = nSec;
       hBRnorm->Fill(log10(primaryE));
@@ -132,6 +140,7 @@ void analysis(char* filename) {
   cXsec->Divide(2,3);
   
   cout << "Simulated events:" << nev << " (" << nev2+1 << ")" <<  endl;
+  
   for (int i=0; i<np; i++) {
     cBR->cd(i+1);
     if(DEBUG) cout << (double)xSec[i] << " / " << (double)nev << endl;
@@ -161,19 +170,33 @@ void analysis(char* filename) {
   if(DEBUG) {
     for (int k=1; k<=Nbins; k++) cout << k << " " << hBRnorm->GetBinContent(k) << " " << hBRnorm->GetBinCenter(k) << endl;
   }
-  
-  cBR->cd(6);
-  hBRnorm->Draw("H");
-  cBR->Update();
 
+
+  TCanvas* cCS = new TCanvas("cCS","cCS",600,450);
+  cCS->cd();  
   hXsecNominal->Divide(hBRnorm);
-  cXsec->cd(6);
   hXsecNominal->Draw("H");
-  cXsec->Update();  
   
- 
-}
+  TCanvas* cNorm = new TCanvas("cNorm","cNorm",600,450);
+  cNorm->cd();
+  hBRnorm->Draw("H");
 
+  fstream myOut;
+  myOut.open("./histograms.txt", ios_base::out);
+
+  for (int i=1; i<=Nbins; i++) {
+    
+    myOut << std::fixed << std::setw(8) << std::setprecision(5) << hXsec[0]->GetBinCenter(i) << " ";
+    for (int j=0; j<np; j++) {
+      myOut << std::fixed << std::setw(8) << std::setprecision(5) << hXsec[j]->GetBinContent(i) << " " << std::fixed << std::setw(8) << std::setprecision(3) << hXsec[j]->GetBinError(i) << " " ;
+    }
+    myOut << endl;
+  }
+  
+  myOut.close();
+ 
+  
+}
 
 
 //C12 -> C11, B10, B11, Be10, Be9, Be7 
