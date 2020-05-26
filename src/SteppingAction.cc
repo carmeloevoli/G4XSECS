@@ -110,8 +110,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep) {
     G4DynamicParticle* ndp = new G4DynamicParticle( dp->GetParticleDefinition(), mom, prePoint->GetKineticEnergy() );
     G4Element* elm = new G4Element(target->GetName(),"",target->GetZ(), target->GetA());
     G4NistManager* nistManager = G4NistManager::Instance();
-    G4Material* g4_c = nistManager->FindOrBuildMaterial("G4_C");
-    G4double xsection = hproc->GetElementCrossSection (ndp, elm, g4_c) ;//, const G4Material *mat=0)
+    //G4Material* g4_c = nistManager->FindOrBuildMaterial("G4_C");
+    G4double xsection = hproc->GetElementCrossSection (ndp, elm);//, g4_c) ;//, const G4Material *mat=0)
 #ifndef __WITHOUT_ROOT__
     TreeManager::Instance()->inelXsec = xsection / CLHEP::millibarn;  // XS4GCR
 #endif

@@ -165,37 +165,39 @@ void PhysicsList::AddPhysicsList(const G4String& name) {  // XS4GCR
         // hadronPhys.push_back(new G4IonElasticPhysics(verb));
         hadronPhys.push_back(new G4IonPhysics(verb));
         // RegisterPhysics( new GammaPhysics("gamma"));
-    } else if (name == "bert") {
-        // non ha interazioni fra ioni a quest'energia!
-        hadronPhys.push_back(new G4HadronPhysicsFTFP_BERT_HP(verb));
-    } else if (name == "bic") {
-        hadronPhys.push_back(new G4IonBinaryCascadePhysics(verb));
-        hadronPhys.push_back(new G4HadronPhysicsQGSP_BIC_HP(verb));
+    } else if (name == "qgsp") {
+        hadronPhys.push_back(new G4HadronPhysicsQGSP_BERT(verb));
+    } else if (name == "ftfp") {
+        hadronPhys.push_back(new G4HadronPhysicsFTFP_BERT(verb));
     } else if (name == "incl") {
-        hadronPhys.push_back(new G4HadronPhysicsINCLXX(verb));
-        hadronPhys.push_back(new G4IonINCLXXPhysics(verb));
-    } else if (name == "incl2") {
-        hadronPhys.push_back(new MyHadronPhysicsINCLXX(verb));
-        hadronPhys.push_back(new G4IonINCLXXPhysics(verb));
-    } else if (name == "incl-ftfp") {
         G4HadronPhysicsINCLXX* hp = new G4HadronPhysicsINCLXX(
             "hInelastic INCLXX with FTFP", true, false, true);
         hp->SetVerboseLevel(verb);
         hadronPhys.push_back(hp);
         hadronPhys.push_back(new G4IonINCLXXPhysics(verb));
-    } else if (name == "qmd") {
-        hadronPhys.push_back(new MyIonQMDPhysics(verb));
-    } else if (name == "php") {
-        // non ha interazioni fra ioni a quest'energia
-        hadronPhys.push_back(new G4IonPhysicsPHP(verb));
-    } else if (name == "allHP" || name == "AllHP") {
-        hadronPhys.push_back(new G4HadronPhysicsQGSP_BIC_AllHP(verb));
-    } else if (name == "wilson" || name == "abrasion") {
-        hadronPhys.push_back(new MyIonWilsonAbrasionPhysics(verb));
-    } else if (name == "qgsp") {
-        hadronPhys.push_back(new G4HadronPhysicsQGSP_BERT(verb));
-    } else if (name == "ftfp") {
-        hadronPhys.push_back(new G4HadronPhysicsFTFP_BERT(verb));
+    } else if (name == "bic") {
+        hadronPhys.push_back(new G4IonBinaryCascadePhysics(verb));
+        hadronPhys.push_back(new G4HadronPhysicsQGSP_BIC_HP(verb));
+
+        //    } else if (name == "bert") {
+        //        // non ha interazioni fra ioni a quest'energia!
+        //        hadronPhys.push_back(new G4HadronPhysicsFTFP_BERT_HP(verb));
+        //    } else if (name == "incl-old") {
+        //        hadronPhys.push_back(new G4HadronPhysicsINCLXX(verb));
+        //        hadronPhys.push_back(new G4IonINCLXXPhysics(verb));
+        //    } else if (name == "incl2") {
+        //        hadronPhys.push_back(new MyHadronPhysicsINCLXX(verb));
+        //        hadronPhys.push_back(new G4IonINCLXXPhysics(verb));
+        //    } else if (name == "qmd") {
+        //        hadronPhys.push_back(new MyIonQMDPhysics(verb));
+        //    } else if (name == "php") {
+        //        // non ha interazioni fra ioni a quest'energia
+        //        hadronPhys.push_back(new G4IonPhysicsPHP(verb));
+        //    } else if (name == "allHP" || name == "AllHP") {
+        //        hadronPhys.push_back(new G4HadronPhysicsQGSP_BIC_AllHP(verb));
+        //    } else if (name == "wilson" || name == "abrasion") {
+        //        hadronPhys.push_back(new MyIonWilsonAbrasionPhysics(verb));
+
     } else {
         G4cout << "PhysicsList::AddPhysicsList: <" << name << ">"
                << " is not defined" << G4endl;

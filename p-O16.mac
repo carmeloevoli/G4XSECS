@@ -14,18 +14,18 @@
 # Almost Infinite target
 /testhadr/det/setSize 10000 m 
 #
-# Set Process model. Options: bic, incl, qmd, ftfp, bert, qgsp
+# Set Process model. Options: bic, incl, ftfp, qgsp
 /physics/setIonInelasticProcess incl
 #
 # Local laptop cores
-/run/numberOfThreads 4
+/run/numberOfThreads 1
 #
 /run/initialize
 #
 # Select fixed energy projectiles
 /gun/particle proton
 /mygun/rand unif
-/mygun/energy 1e6 MeV
+/mygun/energy 1e5 MeV
 #
 # WHAT?
 /process/list
