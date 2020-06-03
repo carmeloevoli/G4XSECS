@@ -37,8 +37,7 @@
 #include "G4HadronPhysicsFTFP_BERT_HP.hh"
 #include "G4HadronPhysicsINCLXX.hh"
 #include "G4HadronPhysicsQGSP_BERT.hh"  // XS4GCR
-#include "G4HadronPhysicsQGSP_BIC_AllHP.hh"
-#include "G4HadronPhysicsQGSP_BIC_HP.hh"
+#include "G4HadronPhysicsQGSP_BIC.hh"
 #include "G4IonBinaryCascadePhysics.hh"  // XS4GCR
 #include "G4IonElasticPhysics.hh"
 #include "G4IonINCLXXPhysics.hh"
@@ -177,7 +176,9 @@ void PhysicsList::AddPhysicsList(const G4String& name) {  // XS4GCR
         hadronPhys.push_back(new G4IonINCLXXPhysics(verb));
     } else if (name == "bic") {
         hadronPhys.push_back(new G4IonBinaryCascadePhysics(verb));
-        hadronPhys.push_back(new G4HadronPhysicsQGSP_BIC_HP(verb));
+        hadronPhys.push_back(new G4HadronPhysicsQGSP_BIC(verb));
+    } else if (name == "qmd") {
+        hadronPhys.push_back(new MyIonQMDPhysics(verb));
 
         //    } else if (name == "bert") {
         //        // non ha interazioni fra ioni a quest'energia!
