@@ -22,12 +22,23 @@
 using namespace std;
 
 int np = 6;
-bool DEBUG = false;
+bool DEBUG = true;
 double lgEmin = 2.0; //100 MeV
-double lgEmax = 5.0; //100 GeV (in MeV)
+double lgEmax = 6.0; //100 GeV (in MeV)
 double step = 0.05; // energy step in logE
 int Nbins = (lgEmax-lgEmin)/step;
 
+string replaced(string str1, string str3) {
+
+  string str = str1; //std::string(filename);
+  string str2 = ".root";
+  //string str3 = ".pdf";
+  str.replace(str.find(str2),str2.size(),str3);
+  //cout << str << endl;
+  return str;
+  
+}
+  
 void analysis(char* filename) {
   
   gStyle->SetOptStat(0);
@@ -123,8 +134,10 @@ void analysis(char* filename) {
 	  if(DEBUG) cout << Z << " " << A << " " <<  *particleName << endl;
 	  first[j] = 1;
 	}
+
 	hBR[j]->Fill(log10(primaryE));
 	hXsec[j]->Fill(log10(primaryE),inelXsec);
+	//cout << log10(primaryE) << " " << inelXsec << endl;
 	xSec[j]++;
       }
     }
@@ -172,20 +185,29 @@ void analysis(char* filename) {
 
   if(DEBUG) for (int k=1; k<=Nbins; k++) cout << k << " " << hBRnorm->GetBinContent(k) << " " << hBRnorm->GetBinCenter(k) << endl;
 
+  string startName = replaced(std::string(filename),".pdf(");
+  cBR->Print(startName.c_str());
+  string middleName = replaced(std::string(filename),".pdf");
+  cXsec->Print(middleName.c_str());
+  
+  
   TCanvas* cCS = new TCanvas("cCS","cCS",600,450);
   cCS->cd();  
   hXsecNominal->Divide(hBRnorm);
   hXsecNominal->Draw("H");
-  
+
+  cCS->Print(middleName.c_str());
   
   TCanvas* cNorm = new TCanvas("cNorm","cNorm",600,450);
   cNorm->cd();
   hBRnorm->Draw("H");
-  
+
+  string stopName = replaced(std::string(filename),".pdf)");
+  cNorm->Print(stopName.c_str());
   
   fstream myOut;
   myOut.open("./histograms.txt", ios_base::out);
-  
+
   
   for (int i=1; i<=Nbins; i++) {
     myOut << std::fixed << std::setw(8) << std::setprecision(5) << hXsec[0]->GetBinCenter(i) << " ";
