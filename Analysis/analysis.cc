@@ -32,8 +32,37 @@ void analysis(char* filename) {
   
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(1);
+  vector<int> xSec(np, 0);
+  vector<int> first(np, 0);
+  string products[] = {"C11", "B11", "B10", "Be10", "Be9", "Be7"};
+  int Znuc[] = {6,  5,  5, 4,  4, 4};
+  int Anuc[] = {11, 11, 10, 10, 9, 7};
+  int color[] = {kRed,  kAzure,  kSpring,  kOrange, kMagenta, kTeal};
+
   TH1D* hBR[np];
   TH1D* hXsec[np];
+  
+  for (int j=0; j<np; j++) {
+    char name[15];
+    sprintf(name, "hBR[%d]",j);
+    char title[50];
+    sprintf(title, "branching ratio for %s",products[j].c_str());
+    if(DEBUG) cout << title << " "  << name << endl;
+    hBR[j] = new TH1D(name, title, Nbins, lgEmin, lgEmax);
+    hBR[j]->GetXaxis()->SetTitle("log_{10}(E/MeV)");
+    sprintf(title, "BR[%s]",products[j].c_str());
+    hBR[j]->GetYaxis()->SetTitle(title);
+    hBR[j]->Sumw2();
+    
+    sprintf(name, "hXsec[%d]",j);
+    sprintf(title, "x-section for %s",products[j].c_str());
+    hXsec[j] = new TH1D(name, title, Nbins, lgEmin, lgEmax);
+    hXsec[j]->GetXaxis()->SetTitle("log_{10}(E/MeV)");
+    sprintf(title, "#sigma_{inel}[%s]",products[j].c_str());
+    hXsec[j]->GetYaxis()->SetTitle(title);
+    hXsec[j]->Sumw2();
+  }
+  
   TH1D* hBRnorm
     = new TH1D("hBRnorm", "total number of events vs energy", Nbins, lgEmin, lgEmax);
   hBRnorm->GetXaxis()->SetTitle("log_{10}(E/MeV)");
@@ -45,12 +74,6 @@ void analysis(char* filename) {
   hXsecNominal->GetYaxis()->SetTitle("#sigma_{inel}[mb]");
   hXsecNominal->Sumw2();
   
-  vector<int> xSec(np, 0);
-  vector<int> first(np, 0);
-  string products[] = {"C11", "B11", "B10", "Be10", "Be9", "Be7"};
-  int Znuc[] = {6,  5,  5, 4,  4, 4};
-  int Anuc[] = {11, 11, 10, 10, 9, 7};
-  int color[] = {kRed,  kAzure,  kSpring,  kOrange, kMagenta, kTeal};
   
   TFile* fileIn= TFile::Open(filename);
   TTree* theTree=(TTree*)fileIn->Get("tree");
@@ -98,26 +121,6 @@ void analysis(char* filename) {
       if(Z == Znuc[j] && A == Anuc[j]) {
 	if(!first[j]) {
 	  if(DEBUG) cout << Z << " " << A << " " <<  *particleName << endl;
-	  char name[10];
-	  sprintf(name, "hBR[%d]",j);
-	  char title[25];
-	  sprintf(title, "branching ratio for %s",products[j].c_str());
-	  if(DEBUG) cout << title << " "  << name << endl;
-	  hBR[j] = new TH1D(name, title, Nbins, lgEmin, lgEmax);
-	  hBR[j]->GetXaxis()->SetTitle("log_{10}(E/MeV)");
-	  sprintf(title, "BR[%s]",products[j].c_str());
-	  hBR[j]->GetYaxis()->SetTitle(title);
-	  hBR[j]->Sumw2();
-
-	  sprintf(name, "hXsec[%d]",j);
-	  sprintf(title, "x-section for %s",products[j].c_str());
-	  hXsec[j] = new TH1D(name, title, Nbins, lgEmin, lgEmax);
-	  hXsec[j]->GetXaxis()->SetTitle("log_{10}(E/MeV)");
-	  sprintf(title, "#sigma_{inel}[%s]",products[j].c_str());
-	  hXsec[j]->GetYaxis()->SetTitle(title);
-	  hXsec[j]->Sumw2();
-
-	  
 	  first[j] = 1;
 	}
 	hBR[j]->Fill(log10(primaryE));
@@ -140,10 +143,10 @@ void analysis(char* filename) {
   cXsec->Divide(2,3);
   
   cout << "Simulated events:" << nev << " (" << nev2+1 << ")" <<  endl;
-  
+
   for (int i=0; i<np; i++) {
+
     cBR->cd(i+1);
-    if(DEBUG) cout << (double)xSec[i] << " / " << (double)nev << endl;
     hBR[i]->SetMarkerStyle(8);
     hBR[i]->SetMarkerSize(.5);
     hBR[i]->SetMarkerColor(color[i]);
@@ -152,9 +155,9 @@ void analysis(char* filename) {
     //hBR[i]->GetXaxis()->SetTitleOffset(0.1);
     //hBR[i]->GetYaxis()->SetTitleOffset(0.1);
     hBR[i]->Draw();
-
     
-    cXsec->cd(i+1); 
+    cXsec->cd(i+1);
+    if(DEBUG) cout << (double)xSec[i] << " / " << (double)nev << endl;    
     hXsec[i]->SetMarkerStyle(4);
     hXsec[i]->SetMarkerSize(.5);
     hXsec[i]->SetMarkerColor(color[i]);
@@ -166,26 +169,25 @@ void analysis(char* filename) {
     
     if(DEBUG) for (int k=1; k<=Nbins; k++) cout << k << " " << hBR[i]->GetBinContent(k) << " " << hBR[i]->GetBinCenter(k) << endl;
   }
-  
-  if(DEBUG) {
-    for (int k=1; k<=Nbins; k++) cout << k << " " << hBRnorm->GetBinContent(k) << " " << hBRnorm->GetBinCenter(k) << endl;
-  }
 
+  if(DEBUG) for (int k=1; k<=Nbins; k++) cout << k << " " << hBRnorm->GetBinContent(k) << " " << hBRnorm->GetBinCenter(k) << endl;
 
   TCanvas* cCS = new TCanvas("cCS","cCS",600,450);
   cCS->cd();  
   hXsecNominal->Divide(hBRnorm);
   hXsecNominal->Draw("H");
   
+  
   TCanvas* cNorm = new TCanvas("cNorm","cNorm",600,450);
   cNorm->cd();
   hBRnorm->Draw("H");
-
+  
+  
   fstream myOut;
   myOut.open("./histograms.txt", ios_base::out);
-
+  
+  
   for (int i=1; i<=Nbins; i++) {
-    
     myOut << std::fixed << std::setw(8) << std::setprecision(5) << hXsec[0]->GetBinCenter(i) << " ";
     for (int j=0; j<np; j++) {
       myOut << std::fixed << std::setw(8) << std::setprecision(5) << hXsec[j]->GetBinContent(i) << " " << std::fixed << std::setw(8) << std::setprecision(3) << hXsec[j]->GetBinError(i) << " " ;
