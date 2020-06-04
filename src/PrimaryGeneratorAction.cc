@@ -81,7 +81,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
 
     G4double E = fE;
     if (fGenerateUniformEnergyDistribution) {
-        G4double minE = 100.0 * MeV;
+        G4double minE = 10.0 * MeV;
         G4double logE =
             log10(minE) + G4UniformRand() * (log10(fE) - log10(minE));
         E = pow(10., logE);
