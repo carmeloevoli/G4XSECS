@@ -87,17 +87,14 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
         //      fAction->SelectAction(fSelectActionCmd->GetNewIntValue(newValue));
     }
     if (command == fRandCmd) {
-      //fAction->SetRandom(fRandCmd->GetNewBoolValue(newValue));
+        // fAction->SetRandom(fRandCmd->GetNewBoolValue(newValue));
         G4cout << "PrimaryGeneratorMessenger: setting random distribution for "
                   "primaries: "
                << newValue << G4endl;
         if (newValue == "false") {
             fAction->SetRandom(false);
-            fAction->SetRandomExp(false);
         } else if (newValue == "uniform" || newValue == "unif") {
             fAction->SetRandom(true);
-        } else if (newValue == "exponential" || newValue == "exp") {
-            fAction->SetRandomExp(true);
         } else {
             G4cerr << "***** Command is not found !!! " << newValue << G4endl;
         }

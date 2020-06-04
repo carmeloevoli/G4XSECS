@@ -57,22 +57,15 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
 
     inline void SetRandom(const G4bool rd) {  // XS4GCR
         fGenerateUniformEnergyDistribution = rd;
-        fGenerateExponentialEnergyDistribution = false;
-    };
-
-    inline void SetRandomExp(const G4bool rd) {  // XS4GCR
-        fGenerateExponentialEnergyDistribution = rd;
-        fGenerateUniformEnergyDistribution = false;
     };
 
    private:
     G4ParticleGun* fParticleGun;
     DetectorConstruction* fDetector;
 
-    PrimaryGeneratorMessenger* messenger;                  // XS4GCR
-    G4double fE = 0;                                       // XS4GCR
-    G4bool fGenerateUniformEnergyDistribution = false;     // XS4GCR
-    G4bool fGenerateExponentialEnergyDistribution = true;  // XS4GCR
+    PrimaryGeneratorMessenger* messenger;              // XS4GCR
+    G4double fE = 0;                                   // XS4GCR
+    G4bool fGenerateUniformEnergyDistribution = true;  // XS4GCR
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

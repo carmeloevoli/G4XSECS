@@ -80,8 +80,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     G4double x0 = (2 * G4UniformRand() - 1.) * beam;  // XS4GCR
 
     G4double E = fE;
-    // if (fGenerateUniformEnergyDistribution)
-    {
+    if (fGenerateUniformEnergyDistribution) {
         G4double minE = 100.0 * MeV;
         G4double logE =
             log10(minE) + G4UniformRand() * (log10(fE) - log10(minE));
