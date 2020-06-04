@@ -12,9 +12,9 @@
 # Select Isotope
 /testhadr/det/setIsotopeMat C12 6 12 1. g/cm3
 # Almost Infinite target
-/testhadr/det/setSize 10000 m 
+/testhadr/det/setSize 100000 m 
 #
-# Set Process model. Options: bic, incl, ftfp, qgsp
+# Set Process model. Options: bic, incl, ftfp, qgsp, qmd
 /physics/setIonInelasticProcess incl
 #
 # Local laptop cores
