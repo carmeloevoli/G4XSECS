@@ -42,3 +42,6 @@ FILE=$G4INCLDATA/table_radius_hfb.dat
 if [[ ! -f "$FILE" ]]; then
     echo "G4INCLDATA does not exist"
 fi
+
+#G4CASCADE_USE_PRECOMPOUND=1
+#export G4CASCADE_USE_PRECOMPOUND
