@@ -5,3 +5,6 @@
 Hadr03-carlo
 Hadr03-original
 build
+analysis/*.pdf
+analysis/*.txt
+analysis/*.root
